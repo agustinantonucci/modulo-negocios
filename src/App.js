@@ -1,7 +1,10 @@
 import "./App.css";
+import TablaNegocios from './components/ui/table/TablaNegocios';
 
 const App = () => {
-  return <p>Template starter</p>;
+  return(
+    <TablaNegocios />
+  );
 };
 
 export default App;
