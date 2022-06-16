@@ -4,7 +4,7 @@ export const getCotizacionDolar = async () => {
   try {
     const config = {
       method: "GET",
-      url: "https://api-cotizaciones-tt7h9.ondigitalocean.app/api/dolarblue",
+      url: "https://api-cotizaciones-tt7h9.ondigitalocean.app/api/dolaroficial",
     };
 
     const res = await axios(config);

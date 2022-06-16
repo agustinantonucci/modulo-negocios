@@ -76,6 +76,8 @@ const TablaNegocios = () => {
       let conteoAbiertos = 0;
       let conteoCerrados = 0;
       negocios.dataNeg.map((element) => {
+
+        
         sumaNegocio += element.neg_valor;
         sumaEtapa += (element.neg_valor * element.eta_avance) / 100;
         element.neg_estado === 0 ? conteoAbiertos++ : conteoCerrados++;
