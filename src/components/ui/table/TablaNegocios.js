@@ -13,12 +13,16 @@ import {
   DislikeOutlined,
   LikeOutlined,
   SearchOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import "./index.css";
 import { useState, useRef, useEffect, useMemo } from "react";
 import moment from "moment";
 import { useQuery } from "@apollo/client";
 import { GET_NEGOCIOS } from "../../../graphql/query/Negocios";
+import { GET_CONFIGURACION } from "../../../graphql/query/Configuracion";
+import { getCotizacionDolar } from "../../../helpers/getCotizacionDolar";
+import { getCotizacionReal } from "../../../helpers/getCotizacionReal";
 
 const TablaNegocios = () => {
   const url = window.location.search;
@@ -35,13 +39,26 @@ const TablaNegocios = () => {
   const [cantCerrados, setCantCerrados] = useState([]);
   const [pipelines, setPipelines] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("");
+  const [config, setConfig] = useState({});
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
   });
 
+  const { data: getConfiguracion } = useQuery(GET_CONFIGURACION);
+
+  getCotizacionDolar().then((res) => {
+    console.log(res.data);
+  });
+
+  getCotizacionReal().then((res) => {
+    console.log(res.data);
+  });
+
   useEffect(() => {
-    if (data) {
+    if (data && getConfiguracion) {
+      const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
+      setConfig(dataConfig[0]);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
       setListadoNegocios(negocios.dataNeg);
@@ -64,22 +81,12 @@ const TablaNegocios = () => {
         element.neg_estado === 0 ? conteoAbiertos++ : conteoCerrados++;
       });
 
-      //* estados disponibles
-      //* 0, 1 y 2
-      // negocios.dataNeg.filter((x) => {
-      //   if (x.neg_estado === 0) return setNegociosAbiertos(x);
-      //   if( x.neg_estado===2) return setNegociosPerdidos(x)
-      //   if(x.neg_estado===1) return setNegociosGanados(x)
-      // });
-
       setTotalNegocio(sumaNegocio);
-
       setTotalEtapa(sumaEtapa);
-
       setCantAbiertos(conteoAbiertos);
       setCantCerrados(conteoCerrados);
     }
-  }, [data]);
+  }, [data, getConfiguracion]);
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -208,7 +215,7 @@ const TablaNegocios = () => {
       align: "right",
       sorter: (a, b) => a.importe - b.importe,
       render: (dataIndex, item) => (
-        <>{`${item.mon_codigo} ${dataIndex.toLocaleString("de-DE", {
+        <>{`${item.mon_iso} ${dataIndex.toLocaleString("de-DE", {
           minimumFractionDigits: 0,
         })}`}</>
       ),
@@ -252,12 +259,12 @@ const TablaNegocios = () => {
             {tipoFiltro === "cerrado" ? (
               <>
                 {item.neg_estado === 1 && (
-                  <Tooltip title="Cerrado Ganado" placement="topRight">
+                  <Tooltip title="Cerrado Ganado" placement="left">
                     <LikeOutlined style={{ color: "green" }} />
                   </Tooltip>
                 )}
                 {item.neg_estado === 2 && (
-                  <Tooltip title="Cerrado Perdido" placement="topRight">
+                  <Tooltip title="Cerrado Perdido" placement="left">
                     <DislikeOutlined style={{ color: "red" }} />
                   </Tooltip>
                 )}
@@ -343,6 +350,12 @@ const TablaNegocios = () => {
             <h4>Total % por etapa</h4>
           </div>
         </Card>
+
+        <div className="config-content">
+          <Tooltip title={config.mon_divisa} placement="bottomRight">
+            <SettingOutlined style={{ fontSize: "15px" }} />
+          </Tooltip>
+        </div>
       </div>
       <Table
         rowKey={"neg_id"}
