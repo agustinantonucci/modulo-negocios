@@ -1,33 +1,57 @@
-import { Table, Tag, Space, Input, Button, Card, Popover, Divider } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Tag,
+  Space,
+  Input,
+  Button,
+  Card,
+  Popover,
+  Divider,
+  Tooltip,
+} from "antd";
+import {
+  DislikeOutlined,
+  LikeOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import "./index.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import moment from "moment";
 import { useQuery } from "@apollo/client";
 import { GET_NEGOCIOS } from "../../../graphql/query/Negocios";
 
 const TablaNegocios = () => {
+  const url = window.location.search;
+  const urlParameter = url.split("=");
+  const idCliente = urlParameter[1];
+
   const searchInput = useRef(null);
-  // const [searchText, setSearchText] = useState("");
-  // const [searchedColumn, setSearchedColumn] = useState("");
   const [listadoNegocios, setListadoNegocios] = useState([]);
+  const [listadoNegociosFiltrados, setListadoNegociosFiltrados] = useState([]);
   const [listadoEtiquetas, setListadoEtiquetas] = useState([]);
   const [totalNegocio, setTotalNegocio] = useState([]);
   const [totalEtapa, setTotalEtapa] = useState([]);
   const [cantAbiertos, setCantAbiertos] = useState([]);
   const [cantCerrados, setCantCerrados] = useState([]);
+  const [pipelines, setPipelines] = useState([]);
+  const [tipoFiltro, setTipoFiltro] = useState("");
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
-    variables: { idCliente: 6510 },
+    variables: { idCliente: Number(idCliente) },
   });
 
   useEffect(() => {
     if (data) {
       const negocios = JSON.parse(data.getNegociosIframeResolver);
-      console.log(data);
-      console.log(negocios);
+
       setListadoNegocios(negocios.dataNeg);
+      setListadoNegociosFiltrados(negocios.dataNeg);
       setListadoEtiquetas(negocios.dataTags);
+      setPipelines(
+        negocios.dataPipelines.map((item) => {
+          return { text: item.pip_nombre, value: item.pip_nombre };
+        })
+      );
 
       let sumaNegocio = 0;
       let sumaEtapa = 0;
@@ -39,10 +63,17 @@ const TablaNegocios = () => {
         sumaEtapa += (element.neg_valor * element.eta_avance) / 100;
         element.neg_estado === 0 ? conteoAbiertos++ : conteoCerrados++;
       });
-      console.log(sumaNegocio);
+
+      //* estados disponibles
+      //* 0, 1 y 2
+      // negocios.dataNeg.filter((x) => {
+      //   if (x.neg_estado === 0) return setNegociosAbiertos(x);
+      //   if( x.neg_estado===2) return setNegociosPerdidos(x)
+      //   if(x.neg_estado===1) return setNegociosGanados(x)
+      // });
+
       setTotalNegocio(sumaNegocio);
 
-      console.log(sumaEtapa);
       setTotalEtapa(sumaEtapa);
 
       setCantAbiertos(conteoAbiertos);
@@ -126,36 +157,15 @@ const TablaNegocios = () => {
       title: "Pipe",
       dataIndex: "pip_nombre",
       key: "pip_nombre",
-      ...getColumnSearchProps("pipe"),
-      // render: (dataIndex, item) => (
-      //   <>
-      //     {dataIndex}
-      //     {item.age < 30 ? (
-      //       <Tag
-      //         color={"green"}
-      //         key={1}
-      //         onClick={() => console.log(dataIndex, item)}
-      //       >
-      //         Menor a 30
-      //       </Tag>
-      //     ) : (
-      //       <Tag
-      //         color={"red"}
-      //         key={1}
-      //         onClick={() => console.log(dataIndex, item)}
-      //       >
-      //         Mayor a 30
-      //       </Tag>
-      //     )}
-      //   </>
-      // ),
-      //se maneja por el dataIndex
-      //
+      filters: pipelines,
+      onFilter: (value, record) => {
+        return record.pip_nombre === value;
+      },
     },
     {
       title: "Etapa",
-      dataIndex: "eta_id",
-      key: "eta_id",
+      dataIndex: "eta_nombre",
+      key: "eta_nombre",
     },
     {
       title: "Negocio",
@@ -166,14 +176,14 @@ const TablaNegocios = () => {
         const etiquetasNegocios = listadoEtiquetas.filter(
           (x) => x.neg_id === item.neg_id
         );
-        console.log(etiquetasNegocios);
         return (
           <>
             {dataIndex}
             <div className="div-contenedor">
-              {etiquetasNegocios.map((element) => {
+              {etiquetasNegocios.map((element, idx) => {
                 return (
                   <Popover
+                    key={idx}
                     content={etiquetasNegocios.map((element) => {
                       return (
                         <Tag color={element.etq_color} key={element.etq_id}>
@@ -186,24 +196,6 @@ const TablaNegocios = () => {
                   </Popover>
                 );
               })}
-              {/* {setEtiquetaPorNegocio(listadoEtiquetas.filter((x) => x.neg_id === item.neg_id))}; */}
-              {/* {item.pipe === "Comercial" && (
-              <>
-                <Popover
-                  content={() => (
-                    <>
-                      <Tag color="#f50">Etiqueta 1</Tag>
-                      <Tag color="#f50fff">Etiqueta 2</Tag>
-                    </>
-                  )}
-                >
-                  <span className="span-cajas">
-                    <Tag color="#f50" style={{ height: "5px" }}></Tag>
-                    <Tag color="#f50fff" style={{ height: "5px" }}></Tag>
-                  </span>
-                </Popover>
-              </>
-            )} */}
             </div>
           </>
         );
@@ -250,7 +242,45 @@ const TablaNegocios = () => {
         new Date(moment(a.cierre, "Do MMMM YYYY").format("L")) -
         new Date(moment(b.cierre, "Do MMMM YYYY").format("L")),
     },
+    {
+      title: "...",
+      key: "tipoCerrado",
+      align: "center",
+      render: (dataIndex, item) => {
+        return (
+          <span>
+            {tipoFiltro === "cerrado" ? (
+              <>
+                {item.neg_estado === 1 && (
+                  <Tooltip title="Cerrado Ganado" placement="topRight">
+                    <LikeOutlined style={{ color: "green" }} />
+                  </Tooltip>
+                )}
+                {item.neg_estado === 2 && (
+                  <Tooltip title="Cerrado Perdido" placement="topRight">
+                    <DislikeOutlined style={{ color: "red" }} />
+                  </Tooltip>
+                )}
+              </>
+            ) : null}
+          </span>
+        );
+      },
+    },
   ];
+
+  const handleClickEstado = (estado) => {
+    setTipoFiltro(estado);
+    if (estado === "abierto") {
+      setListadoNegociosFiltrados(
+        listadoNegocios.filter((x) => x.neg_estado === 0)
+      );
+    } else {
+      setListadoNegociosFiltrados(
+        listadoNegocios.filter((x) => x.neg_estado !== 0)
+      );
+    }
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -265,7 +295,14 @@ const TablaNegocios = () => {
       <div className="card-wrapper">
         <div className="card-principal">
           <div className="div-secundario">
-            <h2>Abiertos</h2>
+            <h2
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                handleClickEstado("abierto");
+              }}
+            >
+              Abiertos
+            </h2>
             <h4>{cantAbiertos}</h4>
           </div>
           <Divider
@@ -277,7 +314,12 @@ const TablaNegocios = () => {
             }}
           />
           <div className="div-secundario">
-            <h2>Cerrados</h2>
+            <h2
+              style={{ cursor: "pointer" }}
+              onClick={() => handleClickEstado("cerrado")}
+            >
+              Cerrados
+            </h2>
             <h4>{cantCerrados}</h4>
           </div>
         </div>
@@ -303,8 +345,9 @@ const TablaNegocios = () => {
         </Card>
       </div>
       <Table
+        rowKey={"neg_id"}
         size={"small"}
-        dataSource={listadoNegocios}
+        dataSource={listadoNegociosFiltrados}
         columns={columns}
         pagination={{
           position: ["none", "bottomCenter"],
