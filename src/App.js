@@ -1,9 +1,13 @@
+import { ApolloProvider } from "@apollo/client";
+import { client } from "./apollo/ApolloClient";
 import "./App.css";
-import TablaNegocios from './components/ui/table/TablaNegocios';
+import TablaNegocios from "./components/ui/table/TablaNegocios";
 
 const App = () => {
-  return(
-    <TablaNegocios />
+  return (
+    <ApolloProvider client={client}>
+      <TablaNegocios />
+    </ApolloProvider>
   );
 };
 

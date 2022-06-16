@@ -12,3 +12,10 @@ code {
     monospace;
 }
 
+td {
+  padding: 8px 1px;
+}
+
+tr {
+  height: 40px;
+}
