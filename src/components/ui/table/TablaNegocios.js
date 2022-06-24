@@ -13,16 +13,17 @@ import {
   DislikeOutlined,
   LikeOutlined,
   SearchOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import "./index.css";
-import { useState, useRef, useEffect, useMemo } from "react";
-import moment from "moment";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_NEGOCIOS } from "../../../graphql/query/Negocios";
 import { GET_CONFIGURACION } from "../../../graphql/query/Configuracion";
-import { getCotizacionDolar } from "../../../helpers/getCotizacionDolar";
-import { getCotizacionReal } from "../../../helpers/getCotizacionReal";
+import { GlobalContext } from "../../context/GlobalContext";
+import { useContext } from "react";
+import { conversorMonedas } from "../../../helpers/conversorMonedas";
+import Info from "./Info";
+import { infoCotizacion } from "./InfoCotizacion";
 
 const TablaNegocios = () => {
   const url = window.location.search;
@@ -36,10 +37,14 @@ const TablaNegocios = () => {
   const [totalNegocio, setTotalNegocio] = useState([]);
   const [totalEtapa, setTotalEtapa] = useState([]);
   const [cantAbiertos, setCantAbiertos] = useState([]);
-  const [cantCerrados, setCantCerrados] = useState([]);
+  const [cantGanados, setCantGanados] = useState([]);
+  const [cantPerdidos, setCantPerdidos] = useState([]);
   const [pipelines, setPipelines] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("");
-  const [config, setConfig] = useState({});
+  const [monIsoBase, setMonIsoBase] = useState([]);
+
+  const { cotizacionDolar, cotizacionReal, ultimaActualizacion } =
+    useContext(GlobalContext);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -47,18 +52,9 @@ const TablaNegocios = () => {
 
   const { data: getConfiguracion } = useQuery(GET_CONFIGURACION);
 
-  getCotizacionDolar().then((res) => {
-    console.log(res.data);
-  });
-
-  getCotizacionReal().then((res) => {
-    console.log(res.data);
-  });
-
   useEffect(() => {
     if (data && getConfiguracion) {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
-      setConfig(dataConfig[0]);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
       setListadoNegocios(negocios.dataNeg);
@@ -69,24 +65,42 @@ const TablaNegocios = () => {
           return { text: item.pip_nombre, value: item.pip_nombre };
         })
       );
-
-      let sumaNegocio = 0;
       let sumaEtapa = 0;
 
       let conteoAbiertos = 0;
-      let conteoCerrados = 0;
+      let conteoGanados = 0;
+      let conteoPerdidos = 0;
+
+      let totalNegocios = 0;
+
       negocios.dataNeg.map((element) => {
+        element.neg_estado === 0
+          ? conteoAbiertos++
+          : element.neg_estado === 1
+          ? conteoGanados++
+          : conteoPerdidos++;
 
-        
-        sumaNegocio += element.neg_valor;
-        sumaEtapa += (element.neg_valor * element.eta_avance) / 100;
-        element.neg_estado === 0 ? conteoAbiertos++ : conteoCerrados++;
+        const elemento = element;
+
+        const monedaDefecto = dataConfig[0].mon_id;
+
+        const { nuevoImporte } = conversorMonedas(
+          elemento,
+          monedaDefecto,
+          cotizacionDolar,
+          cotizacionReal
+        );
+
+        sumaEtapa += (nuevoImporte * element.eta_avance) / 100;
+        totalNegocios += nuevoImporte;
+
+        setTotalNegocio(totalNegocios);
+        setTotalEtapa(sumaEtapa);
+        setCantAbiertos(conteoAbiertos);
+        setCantGanados(conteoGanados);
+        setCantPerdidos(conteoPerdidos);
+        setMonIsoBase(dataConfig[0].mon_iso);
       });
-
-      setTotalNegocio(sumaNegocio);
-      setTotalEtapa(sumaEtapa);
-      setCantAbiertos(conteoAbiertos);
-      setCantCerrados(conteoCerrados);
     }
   }, [data, getConfiguracion]);
 
@@ -104,7 +118,7 @@ const TablaNegocios = () => {
       >
         <Input
           ref={searchInput}
-          placeholder={`Buscar por embudo`}
+          placeholder={"Buscar negocio"}
           value={selectedKeys[0]}
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
@@ -147,12 +161,19 @@ const TablaNegocios = () => {
       />
     ),
     onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownVisibleChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : "",
+    // onFilter: (value, record) =>
+    //   record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    // onFilterDropdownVisibleChange: (visible) => {
+    //   if (visible) {
+    //     setTimeout(() => searchInput.current?.select(), 100);
+    //   }
+    // },
   });
 
   const getDate = (date) => {
@@ -163,7 +184,7 @@ const TablaNegocios = () => {
 
   const columns = [
     {
-      title: "Pipe",
+      title: "Embudo",
       dataIndex: "pip_nombre",
       key: "pip_nombre",
       filters: pipelines,
@@ -180,7 +201,7 @@ const TablaNegocios = () => {
       title: "Negocio",
       dataIndex: "neg_asunto",
       key: "neg_asunto",
-      ...getColumnSearchProps("negocio"),
+      ...getColumnSearchProps("neg_asunto"),
       render: (dataIndex, item) => {
         const etiquetasNegocios = listadoEtiquetas.filter(
           (x) => x.neg_id === item.neg_id
@@ -188,7 +209,9 @@ const TablaNegocios = () => {
         return (
           <>
             {dataIndex}
-            <div className="div-contenedor">
+            <div
+              className={etiquetasNegocios.length > 0 ? "div-contenedor" : ""}
+            >
               {etiquetasNegocios.map((element, idx) => {
                 return (
                   <Popover
@@ -201,7 +224,11 @@ const TablaNegocios = () => {
                       );
                     })}
                   >
-                    <Tag color={element.etq_color} key={element.etq_id}></Tag>
+                    <Tag
+                      color={element.etq_color}
+                      key={element.etq_id}
+                      className="tags"
+                    ></Tag>
                   </Popover>
                 );
               })}
@@ -215,7 +242,7 @@ const TablaNegocios = () => {
       dataIndex: "neg_valor",
       key: "neg_valor",
       align: "right",
-      sorter: (a, b) => a.importe - b.importe,
+      sorter: (a, b) => a.neg_valor - b.neg_valor,
       render: (dataIndex, item) => (
         <>{`${item.mon_iso} ${dataIndex.toLocaleString("de-DE", {
           minimumFractionDigits: 0,
@@ -227,19 +254,17 @@ const TablaNegocios = () => {
       dataIndex: "eta_avance",
       key: "eta_avance",
       align: "right",
-      sorter: (a, b) => a.pcetapa - b.pcetapa,
-      // render: (dataIndex) => (
-      //   <>{dataIndex.toLocaleString("de-DE", { minimumFractionDigits: 0 })}</>
-      // ),
+      sorter: (a, b) => a.eta_avance - b.eta_avance,
     },
     {
       title: "Fecha de Creación",
       dataIndex: "neg_fechacreacion",
       key: "neg_fechacreacion",
       align: "center",
-      sorter: (a, b) =>
-        new Date(moment(a.cierre, "Do MMMM YYYY").format("L")) -
-        new Date(moment(b.cierre, "Do MMMM YYYY").format("L")),
+      sorter: (a, b) => a.neg_fechacreacion.localeCompare(b.neg_fechacreacion),
+      // sorter: (a, b) =>
+      //   new Date(moment(a.neg_fechacreacion, "Do MMMM YYYY").format("L")) -
+      //   new Date(moment(b.neg_fechacreacion, "Do MMMM YYYY").format("L")),
       render: (dataIndex) => getDate(dataIndex),
     },
     {
@@ -247,9 +272,11 @@ const TablaNegocios = () => {
       dataIndex: "neg_fechacierre",
       key: "neg_fechacierre",
       align: "center",
-      sorter: (a, b) =>
-        new Date(moment(a.cierre, "Do MMMM YYYY").format("L")) -
-        new Date(moment(b.cierre, "Do MMMM YYYY").format("L")),
+      sorter: (a, b) => a.neg_fechacierre.localeCompare(b.neg_fechacierre),
+      // sorter: (a, b) =>
+      //   new Date(moment(a.neg_fechacierre, "Do MMMM YYYY").format("L")) -
+      //   new Date(moment(b.neg_fechacierre, "Do MMMM YYYY").format("L")),
+      render: (dataIndex) => getDate(dataIndex),
     },
     {
       title: "...",
@@ -284,10 +311,12 @@ const TablaNegocios = () => {
       setListadoNegociosFiltrados(
         listadoNegocios.filter((x) => x.neg_estado === 0)
       );
-    } else {
+    } else if (estado === "cerrado") {
       setListadoNegociosFiltrados(
         listadoNegocios.filter((x) => x.neg_estado !== 0)
       );
+    } else {
+      setListadoNegociosFiltrados(listadoNegocios);
     }
   };
 
@@ -302,17 +331,16 @@ const TablaNegocios = () => {
   return (
     <>
       <div className="card-wrapper">
-        <div className="card-principal">
-          <div className="div-secundario">
-            <h2
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                handleClickEstado("abierto");
-              }}
-            >
-              Abiertos
-            </h2>
-            <h4>{cantAbiertos}</h4>
+        <div className="card-contadores">
+          <div
+            className="div-secundario"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              handleClickEstado("total");
+            }}
+          >
+            <p className="texto">NEGOCIOS</p>
+            <p className="numeros">{cantAbiertos + cantGanados + cantPerdidos}</p>
           </div>
           <Divider
             type="vertical"
@@ -322,41 +350,57 @@ const TablaNegocios = () => {
               borderWidth: "2px",
             }}
           />
-          <div className="div-secundario">
-            <h2
+          <div>
+            <div
+              className="div-secundario"
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                handleClickEstado("abierto");
+              }}
+            >
+              <p className="texto">ABIERTOS</p>
+              <p className="numeros">{cantAbiertos}</p>
+            </div>
+            <hr className="hr1" />
+            <div
+              className="div-secundario"
               style={{ cursor: "pointer" }}
               onClick={() => handleClickEstado("cerrado")}
             >
-              Cerrados
-            </h2>
-            <h4>{cantCerrados}</h4>
+              <p className="texto">CERRADOS</p>
+              <p className="numeros">{cantGanados + cantPerdidos}</p>
+            </div>
           </div>
         </div>
         <Card className="card-content">
           <div className="div-content">
-            <h2>
+            <p className="totales">
               {`U$D ${totalNegocio.toLocaleString("de-DE", {
                 minimumFractionDigits: 0,
               })}`}
-            </h2>
-            <h4>Total negocios</h4>
+            </p>
+            <p className="descripcion">Total negocios</p>
           </div>
         </Card>
         <Card className="card-content">
           <div className="div-content">
-            <h2>
+            <p className="totales">
               {`U$D ${totalEtapa.toLocaleString("de-DE", {
                 minimumFractionDigits: 0,
               })}`}
-            </h2>
-            <h4>Total % por etapa</h4>
+            </p>
+            <p className="descripcion">Total % por etapa</p>
           </div>
         </Card>
-
-        <div className="config-content">
-          <Tooltip title={config.mon_divisa} placement="bottomRight">
-            <SettingOutlined style={{ fontSize: "15px" }} />
-          </Tooltip>
+        <div className="filter-data">
+          <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
+            {infoCotizacion(
+              monIsoBase,
+              cotizacionDolar,
+              cotizacionReal,
+              ultimaActualizacion
+            )}
+          </Info>
         </div>
       </div>
       <Table

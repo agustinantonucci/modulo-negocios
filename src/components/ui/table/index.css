@@ -1,51 +1,129 @@
-
-.card-wrapper {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    width: 100%;
+p {
+  margin: 0px;
 }
 
-.card-principal {
-    width: 33%;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    border: 1px solid #f0f0f0;
+.card-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+}
+
+.card-contadores {
+  width: 33%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  align-content: space-evenly;
+  border: 1px solid #f0f0f0;
+  font-size: medium;
 }
 
 .card-content {
-    display: flex;
-    width: 50%;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
 }
 
 .div-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .div-secundario {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0px;
+  font-weight: bold;
 }
 
 .span-cajas {
-    margin-top: -30px;
+  margin-top: -30px;
 }
 
 .div-contenedor {
-    margin-top: -10px;
+  margin-top: -10px;
+  margin-bottom: -10px;
 }
 
-.config-content{
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px;
-    align-items:center
+.config-content {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  align-items: center;
 }
+
+.filter-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cotizaciones_p {
+  margin-bottom: 5px;
+  border-bottom: 1px dotted rgb(233, 233, 233);
+  padding: 3px 0;
+}
+
+.cotizacion {
+  font-weight: 700;
+  color: #333;
+}
+
+.info_data {
+  font-size: 0.8rem;
+  color: rgb(196, 196, 196);
+  max-width: 200px;
+}
+
+.totales {
+  font-weight: 800;
+  font-size: x-large;
+  margin: 0px;
+}
+
+.descripcion {
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.tags {
+  min-height: 5px;
+  font-size: .9rem;
+  min-width: 20px;
+  margin-right: 3px;
+  border-radius: 4px;
+}
+
+.hr1 {
+  width: 100%;
+  border-top: #f0f0f0;
+  border-width: 2px;
+  border-left: 0px;
+}
+
+.texto {
+  font-size: 16px;
+}
+
+.numeros {
+  font-size: 20px;
+}
+
+
+.ant-pagination-item {
+  border-color: #00b33c;
+}
+.ant-pagination-item a {
+  color: #00b33c;
+}
+
