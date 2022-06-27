@@ -127,3 +127,10 @@ p {
   color: #00b33c;
 }
 
+.dashed {
+  border-style: dashed;
+  border-width: 1px;
+  padding: 10px;
+  border-radius: 3px;
+  border-color: #00b33c;
+}

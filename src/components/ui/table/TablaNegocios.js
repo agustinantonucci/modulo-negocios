@@ -40,7 +40,7 @@ const TablaNegocios = () => {
   const [cantGanados, setCantGanados] = useState([]);
   const [cantPerdidos, setCantPerdidos] = useState([]);
   const [pipelines, setPipelines] = useState([]);
-  const [tipoFiltro, setTipoFiltro] = useState("");
+  const [tipoFiltro, setTipoFiltro] = useState("total");
   const [monIsoBase, setMonIsoBase] = useState([]);
 
   const { cotizacionDolar, cotizacionReal, ultimaActualizacion } =
@@ -179,7 +179,7 @@ const TablaNegocios = () => {
   const getDate = (date) => {
     const fecha = date.split("T");
 
-    return fecha[0].split("-").reverse().join("-");
+    return fecha[0].split("-").reverse().join("/");
   };
 
   const columns = [
@@ -333,7 +333,7 @@ const TablaNegocios = () => {
       <div className="card-wrapper">
         <div className="card-contadores">
           <div
-            className="div-secundario"
+            className={tipoFiltro === "total" ? "div-secundario dashed" : "div-secundario"}
             style={{ cursor: "pointer" }}
             onClick={() => {
               handleClickEstado("total");
@@ -352,7 +352,7 @@ const TablaNegocios = () => {
           />
           <div>
             <div
-              className="div-secundario"
+              className={tipoFiltro === "abierto" ? "div-secundario dashed" : "div-secundario"}
               style={{ cursor: "pointer" }}
               onClick={() => {
                 handleClickEstado("abierto");
@@ -363,7 +363,7 @@ const TablaNegocios = () => {
             </div>
             <hr className="hr1" />
             <div
-              className="div-secundario"
+              className={tipoFiltro === "cerrado" ? "div-secundario dashed" : "div-secundario"}
               style={{ cursor: "pointer" }}
               onClick={() => handleClickEstado("cerrado")}
             >
