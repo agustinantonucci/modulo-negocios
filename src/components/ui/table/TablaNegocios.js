@@ -58,7 +58,9 @@ const TablaNegocios = () => {
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
       setListadoNegocios(negocios.dataNeg);
-      setListadoNegociosFiltrados(negocios.dataNeg);
+      setListadoNegociosFiltrados(
+        negocios.dataNeg.filter((x) => x.neg_estado === 0)
+      );
       setListadoEtiquetas(negocios.dataTags);
       setPipelines(
         negocios.dataPipelines.map((item) => {
@@ -167,13 +169,6 @@ const TablaNegocios = () => {
             .toLowerCase()
             .includes(value.toLowerCase())
         : "",
-    // onFilter: (value, record) =>
-    //   record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    // onFilterDropdownVisibleChange: (visible) => {
-    //   if (visible) {
-    //     setTimeout(() => searchInput.current?.select(), 100);
-    //   }
-    // },
   });
 
   const getDate = (date) => {
@@ -262,9 +257,6 @@ const TablaNegocios = () => {
       key: "neg_fechacreacion",
       align: "center",
       sorter: (a, b) => a.neg_fechacreacion.localeCompare(b.neg_fechacreacion),
-      // sorter: (a, b) =>
-      //   new Date(moment(a.neg_fechacreacion, "Do MMMM YYYY").format("L")) -
-      //   new Date(moment(b.neg_fechacreacion, "Do MMMM YYYY").format("L")),
       render: (dataIndex) => getDate(dataIndex),
     },
     {
@@ -273,9 +265,6 @@ const TablaNegocios = () => {
       key: "neg_fechacierre",
       align: "center",
       sorter: (a, b) => a.neg_fechacierre.localeCompare(b.neg_fechacierre),
-      // sorter: (a, b) =>
-      //   new Date(moment(a.neg_fechacierre, "Do MMMM YYYY").format("L")) -
-      //   new Date(moment(b.neg_fechacierre, "Do MMMM YYYY").format("L")),
       render: (dataIndex) => getDate(dataIndex),
     },
     {
@@ -333,14 +322,20 @@ const TablaNegocios = () => {
       <div className="card-wrapper">
         <div className="card-contadores">
           <div
-            className={tipoFiltro === "total" ? "div-secundario dashed" : "div-secundario"}
+            className={
+              tipoFiltro === "total"
+                ? "div-secundario dashed"
+                : "div-secundario"
+            }
             style={{ cursor: "pointer" }}
             onClick={() => {
               handleClickEstado("total");
             }}
           >
             <p className="texto">NEGOCIOS</p>
-            <p className="numeros">{cantAbiertos + cantGanados + cantPerdidos}</p>
+            <p className="numeros">
+              {cantAbiertos + cantGanados + cantPerdidos}
+            </p>
           </div>
           <Divider
             type="vertical"
@@ -352,7 +347,11 @@ const TablaNegocios = () => {
           />
           <div>
             <div
-              className={tipoFiltro === "abierto" ? "div-secundario dashed" : "div-secundario"}
+              className={
+                tipoFiltro === "abierto"
+                  ? "div-secundario dashed"
+                  : "div-secundario"
+              }
               style={{ cursor: "pointer" }}
               onClick={() => {
                 handleClickEstado("abierto");
@@ -363,7 +362,11 @@ const TablaNegocios = () => {
             </div>
             <hr className="hr1" />
             <div
-              className={tipoFiltro === "cerrado" ? "div-secundario dashed" : "div-secundario"}
+              className={
+                tipoFiltro === "cerrado"
+                  ? "div-secundario dashed"
+                  : "div-secundario"
+              }
               style={{ cursor: "pointer" }}
               onClick={() => handleClickEstado("cerrado")}
             >

@@ -14,7 +14,7 @@ export const client = new ApolloClient({
     //uri: "http://beeapp.binamics.com.ar:4002",
     // uri: "http://localhost:4002",
      //uri: URL,
-     //uri: "http://10.0.0.28:4002",
+    //  uri: "http://10.0.0.28:4002",
     // uri: "http://170.239.49.41:4002",
   }),
 });
