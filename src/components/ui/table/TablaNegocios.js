@@ -186,6 +186,11 @@ const TablaNegocios = () => {
       onFilter: (value, record) => {
         return record.pip_nombre === value;
       },
+      render: (dataIndex) => {
+        return (
+          <p className="columna-color">{dataIndex}</p>
+        );
+      }
     },
     {
       title: "Etapa",
@@ -203,7 +208,7 @@ const TablaNegocios = () => {
         );
         return (
           <>
-            {dataIndex}
+            <p className="columna-color">{dataIndex}</p>
             <div
               className={etiquetasNegocios.length > 0 ? "div-contenedor" : ""}
             >
