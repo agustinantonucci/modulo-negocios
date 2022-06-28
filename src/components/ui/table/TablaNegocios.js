@@ -40,7 +40,7 @@ const TablaNegocios = () => {
   const [cantGanados, setCantGanados] = useState([]);
   const [cantPerdidos, setCantPerdidos] = useState([]);
   const [pipelines, setPipelines] = useState([]);
-  const [tipoFiltro, setTipoFiltro] = useState("total");
+  const [tipoFiltro, setTipoFiltro] = useState("abierto");
   const [monIsoBase, setMonIsoBase] = useState([]);
 
   const { cotizacionDolar, cotizacionReal, ultimaActualizacion } =
