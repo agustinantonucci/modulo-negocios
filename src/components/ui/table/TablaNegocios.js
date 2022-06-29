@@ -43,7 +43,7 @@ const TablaNegocios = () => {
   const [tipoFiltro, setTipoFiltro] = useState("abierto");
   const [monIsoBase, setMonIsoBase] = useState([]);
 
-  const { cotizacionDolar, cotizacionReal, ultimaActualizacion } =
+  const { cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp } =
     useContext(GlobalContext);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
@@ -53,6 +53,7 @@ const TablaNegocios = () => {
   const { data: getConfiguracion } = useQuery(GET_CONFIGURACION);
 
   useEffect(() => {
+    setReloadingApp(true);
     if (data && getConfiguracion) {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
@@ -103,6 +104,7 @@ const TablaNegocios = () => {
         setCantPerdidos(conteoPerdidos);
         setMonIsoBase(dataConfig[0].mon_iso);
       });
+      setReloadingApp(false);
     }
   }, [data, getConfiguracion]);
 
@@ -196,6 +198,7 @@ const TablaNegocios = () => {
       title: "Etapa",
       dataIndex: "eta_nombre",
       key: "eta_nombre",
+      align: "right",
     },
     {
       title: "Negocio",
@@ -365,7 +368,7 @@ const TablaNegocios = () => {
               <p className="texto">ABIERTOS</p>
               <p className="numeros">{cantAbiertos}</p>
             </div>
-            <hr className="hr1" />
+            <hr className={tipoFiltro === "total" ? "hr1" : "cancela-hr"} />
             <div
               className={
                 tipoFiltro === "cerrado"

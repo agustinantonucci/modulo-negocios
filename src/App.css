@@ -51,3 +51,11 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
   box-shadow: 0 0 0px 1000px #ffffff inset !important;
 }
+
+.color {
+  color: #00b33c;
+}
+
+.ant-spin-dot-item {
+  background-color: #00b33c;
+}
