@@ -34,8 +34,8 @@ const TablaNegocios = () => {
   const [listadoNegocios, setListadoNegocios] = useState([]);
   const [listadoNegociosFiltrados, setListadoNegociosFiltrados] = useState([]);
   const [listadoEtiquetas, setListadoEtiquetas] = useState([]);
-  const [totalNegocio, setTotalNegocio] = useState([]);
-  const [totalEtapa, setTotalEtapa] = useState([]);
+  const [totalMostrar, setTotalMostrar] = useState([]);
+  const [totalEtapaMostrar, setTotalEtapaMostrar] = useState([]);
   const [cantAbiertos, setCantAbiertos] = useState([]);
   const [cantGanados, setCantGanados] = useState([]);
   const [cantPerdidos, setCantPerdidos] = useState([]);
@@ -43,8 +43,12 @@ const TablaNegocios = () => {
   const [tipoFiltro, setTipoFiltro] = useState("abierto");
   const [monIsoBase, setMonIsoBase] = useState([]);
 
-  const { cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp } =
-    useContext(GlobalContext);
+  const {
+    cotizacionDolar,
+    cotizacionReal,
+    ultimaActualizacion,
+    setReloadingApp,
+  } = useContext(GlobalContext);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -59,33 +63,47 @@ const TablaNegocios = () => {
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
       setListadoNegocios(negocios.dataNeg);
-      setListadoNegociosFiltrados(
-        negocios.dataNeg.filter((x) => x.neg_estado === 0)
-      );
+
+      
+
       setListadoEtiquetas(negocios.dataTags);
       setPipelines(
         negocios.dataPipelines.map((item) => {
           return { text: item.pip_nombre, value: item.pip_nombre };
         })
       );
-      let sumaEtapa = 0;
 
-      let conteoAbiertos = 0;
-      let conteoGanados = 0;
-      let conteoPerdidos = 0;
+      let sumaNegociosAbiertos = 0;
+      let sumaNegociosCerrados = 0;
 
-      let totalNegocios = 0;
+      let sumaEtapaAbiertos = 0;
+      let sumaEtapaCerrados = 0;
 
-      negocios.dataNeg.map((element) => {
-        element.neg_estado === 0
-          ? conteoAbiertos++
-          : element.neg_estado === 1
-          ? conteoGanados++
-          : conteoPerdidos++;
+      const negociosAbiertos = negocios.dataNeg.filter(
+        (negocio) => negocio.neg_estado === 0
+      );
 
-        const elemento = element;
+      const negociosCerrados = negocios.dataNeg.filter(
+        (negocio) => negocio.neg_estado !== 0
+      );
 
-        const monedaDefecto = dataConfig[0].mon_id;
+      setListadoNegociosFiltrados(
+        tipoFiltro === "abierto" ? negociosAbiertos : tipoFiltro === "cerrado" ? negociosCerrados : listadoNegocios
+      );
+
+      setCantAbiertos(negociosAbiertos.length);
+      setCantGanados(
+        negociosCerrados.filter((negocio) => negocio.neg_estado === 1).length
+      );
+      setCantPerdidos(
+        negociosCerrados.filter((negocio) => negocio.neg_estado === 2).length
+      );
+
+      const monedaDefecto = dataConfig[0].mon_id;
+      setMonIsoBase(dataConfig[0].mon_iso);
+
+      negociosAbiertos.map((negocio) => {
+        const elemento = negocio;
 
         const { nuevoImporte } = conversorMonedas(
           elemento,
@@ -94,19 +112,40 @@ const TablaNegocios = () => {
           cotizacionReal
         );
 
-        sumaEtapa += (nuevoImporte * element.eta_avance) / 100;
-        totalNegocios += nuevoImporte;
-
-        setTotalNegocio(totalNegocios);
-        setTotalEtapa(sumaEtapa);
-        setCantAbiertos(conteoAbiertos);
-        setCantGanados(conteoGanados);
-        setCantPerdidos(conteoPerdidos);
-        setMonIsoBase(dataConfig[0].mon_iso);
+        sumaEtapaAbiertos += (nuevoImporte * negocio.eta_avance) / 100;
+        sumaNegociosAbiertos += nuevoImporte;
       });
+
+      console.log(sumaNegociosAbiertos, sumaEtapaAbiertos);
+
+      negociosCerrados.map((negocio) => {
+        const elemento = negocio;
+
+        const { nuevoImporte } = conversorMonedas(
+          elemento,
+          monedaDefecto,
+          cotizacionDolar,
+          cotizacionReal
+        );
+
+        sumaEtapaCerrados += (nuevoImporte * negocio.eta_avance) / 100;
+        sumaNegociosCerrados += nuevoImporte;
+      });
+
+      console.log(sumaNegociosAbiertos, sumaEtapaAbiertos);
+
+      tipoFiltro === "abierto"
+        ? (setTotalMostrar(sumaNegociosAbiertos),
+          setTotalEtapaMostrar(sumaEtapaAbiertos))
+        : tipoFiltro === "cerrado"
+        ? (setTotalMostrar(sumaNegociosCerrados),
+          setTotalEtapaMostrar(sumaEtapaCerrados))
+        : (setTotalMostrar(sumaNegociosAbiertos + sumaNegociosCerrados),
+          setTotalEtapaMostrar(sumaEtapaAbiertos + sumaEtapaCerrados));
+
       setReloadingApp(false);
     }
-  }, [data, getConfiguracion]);
+  }, [data, getConfiguracion, tipoFiltro]);
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -189,10 +228,8 @@ const TablaNegocios = () => {
         return record.pip_nombre === value;
       },
       render: (dataIndex) => {
-        return (
-          <p className="columna-color">{dataIndex}</p>
-        );
-      }
+        return <p className="columna-color">{dataIndex}</p>;
+      },
     },
     {
       title: "Etapa",
@@ -386,7 +423,7 @@ const TablaNegocios = () => {
         <Card className="card-content">
           <div className="div-content">
             <p className="totales">
-              {`U$D ${totalNegocio.toLocaleString("de-DE", {
+              {`U$D ${totalMostrar.toLocaleString("de-DE", {
                 minimumFractionDigits: 0,
               })}`}
             </p>
@@ -396,7 +433,7 @@ const TablaNegocios = () => {
         <Card className="card-content">
           <div className="div-content">
             <p className="totales">
-              {`U$D ${totalEtapa.toLocaleString("de-DE", {
+              {`U$D ${totalEtapaMostrar.toLocaleString("de-DE", {
                 minimumFractionDigits: 0,
               })}`}
             </p>
