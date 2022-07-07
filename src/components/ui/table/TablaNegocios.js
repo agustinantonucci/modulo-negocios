@@ -116,8 +116,6 @@ const TablaNegocios = () => {
         sumaNegociosAbiertos += nuevoImporte;
       });
 
-      console.log(sumaNegociosAbiertos, sumaEtapaAbiertos);
-
       negociosCerrados.map((negocio) => {
         const elemento = negocio;
 
@@ -132,8 +130,11 @@ const TablaNegocios = () => {
         sumaNegociosCerrados += nuevoImporte;
       });
 
-      console.log(sumaNegociosAbiertos, sumaEtapaAbiertos);
+      // const{ totalNegocios, totalEtapas } = calcularTotales(tipoFiltro, sumaNegociosAbiertos, sumaNegociosCerrados, sumaEtapaAbiertos, sumaEtapaCerrados);
 
+      // setTotalMostrar(totalNegocios);
+      // setTotalEtapaMostrar(totalEtapas);
+      
       tipoFiltro === "abierto"
         ? (setTotalMostrar(sumaNegociosAbiertos),
           setTotalEtapaMostrar(sumaEtapaAbiertos))
@@ -217,6 +218,8 @@ const TablaNegocios = () => {
 
     return fecha[0].split("-").reverse().join("/");
   };
+
+
 
   const columns = [
     {
