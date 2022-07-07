@@ -198,6 +198,7 @@ p {
 
 .ant-dropdown-menu-item-selected {
   color: #00b33c;
+  background-color: #F0FFEA;
 }
 
 .ant-dropdown-menu-item-active {
