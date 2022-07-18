@@ -28,7 +28,8 @@ import { infoCotizacion } from "./InfoCotizacion";
 const TablaNegocios = () => {
   const url = window.location.search;
   const urlParameter = url.split("=");
-  const idCliente = urlParameter[1];
+  const primerSplit = urlParameter[1].split("?");
+  const idCliente = primerSplit[0];
 
   const searchInput = useRef(null);
   const [listadoNegocios, setListadoNegocios] = useState([]);
@@ -42,6 +43,7 @@ const TablaNegocios = () => {
   const [pipelines, setPipelines] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("abierto");
   const [monIsoBase, setMonIsoBase] = useState([]);
+  const [verInfo, setVerInfo] = useState([]);
 
   const {
     cotizacionDolar,
@@ -58,13 +60,15 @@ const TablaNegocios = () => {
 
   useEffect(() => {
     setReloadingApp(true);
+    setVerInfo(urlParameter[2] ? urlParameter[2] : 0);
+
     if (data && getConfiguracion) {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
       setListadoNegocios(negocios.dataNeg);
 
-      
+      console.log(verInfo);
 
       setListadoEtiquetas(negocios.dataTags);
       setPipelines(
@@ -88,7 +92,11 @@ const TablaNegocios = () => {
       );
 
       setListadoNegociosFiltrados(
-        tipoFiltro === "abierto" ? negociosAbiertos : tipoFiltro === "cerrado" ? negociosCerrados : listadoNegocios
+        tipoFiltro === "abierto"
+          ? negociosAbiertos
+          : tipoFiltro === "cerrado"
+          ? negociosCerrados
+          : listadoNegocios
       );
 
       setCantAbiertos(negociosAbiertos.length);
@@ -134,7 +142,7 @@ const TablaNegocios = () => {
 
       // setTotalMostrar(totalNegocios);
       // setTotalEtapaMostrar(totalEtapas);
-      
+
       tipoFiltro === "abierto"
         ? (setTotalMostrar(sumaNegociosAbiertos),
           setTotalEtapaMostrar(sumaEtapaAbiertos))
@@ -219,8 +227,6 @@ const TablaNegocios = () => {
     return fecha[0].split("-").reverse().join("/");
   };
 
-
-
   const columns = [
     {
       title: "Embudo",
@@ -238,7 +244,7 @@ const TablaNegocios = () => {
       title: "Etapa",
       dataIndex: "eta_nombre",
       key: "eta_nombre",
-      align: "right",
+      align: "left",
     },
     {
       title: "Negocio",
@@ -443,16 +449,22 @@ const TablaNegocios = () => {
             <p className="descripcion">Total % por etapa</p>
           </div>
         </Card>
-        <div className="filter-data">
-          <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
-            {infoCotizacion(
-              monIsoBase,
-              cotizacionDolar,
-              cotizacionReal,
-              ultimaActualizacion
-            )}
-          </Info>
-        </div>
+        {
+          (verInfo === "1") 
+          ? (
+            <div className="filter-data">
+              <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
+              {infoCotizacion(
+                monIsoBase,
+                cotizacionDolar,
+                cotizacionReal,
+                ultimaActualizacion
+              )
+            }
+            </Info>
+          </div>) 
+          : (<></>)
+        }
       </div>
       <Table
         rowKey={"neg_id"}
