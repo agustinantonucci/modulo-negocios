@@ -60,7 +60,7 @@ const TablaNegocios = () => {
 
   useEffect(() => {
     setReloadingApp(true);
-    setVerInfo(urlParameter[2] ? urlParameter[2] : 0);
+    setVerInfo(urlParameter[2] ? urlParameter[2] : "0");
 
     if (data && getConfiguracion) {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
@@ -450,7 +450,7 @@ const TablaNegocios = () => {
           </div>
         </Card>
         {
-          (verInfo === "1") 
+          (verInfo === "0") 
           ? (
             <div className="filter-data">
               <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
