@@ -11,6 +11,7 @@ import {
 } from "antd";
 import {
   DislikeOutlined,
+  EyeOutlined,
   LikeOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
@@ -50,7 +51,12 @@ const TablaNegocios = () => {
     cotizacionReal,
     ultimaActualizacion,
     setReloadingApp,
+    idNeg, 
+    setIdNeg,
   } = useContext(GlobalContext);
+
+  console.log(idNeg);
+  localStorage.setItem("IdNeg", idNeg);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -65,6 +71,8 @@ const TablaNegocios = () => {
     if (data && getConfiguracion) {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
+
+      console.log(negocios);
 
       setListadoNegocios(negocios.dataNeg);
 
@@ -155,6 +163,10 @@ const TablaNegocios = () => {
       setReloadingApp(false);
     }
   }, [data, getConfiguracion, tipoFiltro]);
+
+  const obtenerFila = (val) => {
+    console.log(val);
+  };
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -342,6 +354,11 @@ const TablaNegocios = () => {
                 )}
               </>
             ) : null}
+            {/* {tipoFiltro === "abierto" ? (
+              <>
+                <Button title="Ver Negocio" onClick={() => obtenerFila()} placement="left" style={{border:"none", margin:"0px", padding:"0px", backgroundColor:"transparent", boxShadow:"none"}} icon={<EyeOutlined style={{ color: "green" }} />} />
+              </>
+            ) : null} */}
           </span>
         );
       },
@@ -449,22 +466,20 @@ const TablaNegocios = () => {
             <p className="descripcion">Total % por etapa</p>
           </div>
         </Card>
-        {
-          (verInfo === "0") 
-          ? (
-            <div className="filter-data">
-              <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
+        {verInfo === "0" ? (
+          <div className="filter-data">
+            <Info placement={"left"} title={`Cotización ${monIsoBase}`}>
               {infoCotizacion(
                 monIsoBase,
                 cotizacionDolar,
                 cotizacionReal,
                 ultimaActualizacion
-              )
-            }
+              )}
             </Info>
-          </div>) 
-          : (<></>)
-        }
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
       <Table
         rowKey={"neg_id"}
@@ -474,6 +489,9 @@ const TablaNegocios = () => {
         pagination={{
           position: ["none", "bottomCenter"],
         }}
+        onRow={record => ({
+          onClick:() => {setIdNeg(record.neg_id)}
+        })}
       />
     </>
   );
