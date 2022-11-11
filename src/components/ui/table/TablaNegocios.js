@@ -56,9 +56,7 @@ const TablaNegocios = () => {
     idUser,
   } = useContext(GlobalContext);
 
-  let idC = Number(idCliente);
-
-  console.log(idNeg);
+  //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
@@ -177,11 +175,11 @@ const TablaNegocios = () => {
     const loc = window.location.pathname;
     const URL = `${PROTOCOL}//${HOSTNAME}:${PORT}`;
 
-    console.log("URL ", URL);
+    //console.log("URL ", URL);
     const c = idUser;
     const u = localStorage.getItem('usuario');
-    console.log("usuarioLocalStorage: ", u);
-    console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
+    //console.log("usuarioLocalStorage: ", u);
+    //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
     //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
     window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`;
