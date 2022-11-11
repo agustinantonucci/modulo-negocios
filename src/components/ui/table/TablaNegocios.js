@@ -51,9 +51,12 @@ const TablaNegocios = () => {
     cotizacionReal,
     ultimaActualizacion,
     setReloadingApp,
-    idNeg, 
+    idNeg,
     setIdNeg,
+    idUser,
   } = useContext(GlobalContext);
+
+  let idC = Number(idCliente);
 
   console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
@@ -164,8 +167,25 @@ const TablaNegocios = () => {
     }
   }, [data, getConfiguracion, tipoFiltro]);
 
+  console.log(idUser);
+
   const obtenerFila = (val) => {
-    console.log(val);
+    setIdNeg(val);
+    const PORT = window.location.port ? window.location.port : 80;
+    const PROTOCOL = window.location.protocol;
+    const HOSTNAME = window.location.hostname;
+    const loc = window.location.pathname;
+    const URL = `${PROTOCOL}//${HOSTNAME}:${PORT}`;
+
+    console.log("URL ", URL);
+    const c = idUser;
+    const u = localStorage.getItem('usuario');
+    console.log("usuarioLocalStorage: ", u);
+    console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
+
+    //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`;
+
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -489,8 +509,10 @@ const TablaNegocios = () => {
         pagination={{
           position: ["none", "bottomCenter"],
         }}
-        onRow={record => ({
-          onClick:() => {setIdNeg(record.neg_id)}
+        onRow={(record) => ({
+          onClick: () => {
+            obtenerFila(record.neg_id);
+          },
         })}
       />
     </>

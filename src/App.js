@@ -5,7 +5,7 @@ import esES from "antd/lib/locale/es_ES";
 import "./App.css";
 import TablaNegocios from "./components/ui/table/TablaNegocios";
 import { GlobalContext } from "./components/context/GlobalContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {getCotizacionDolar} from '../src/helpers/getCotizacionDolar'; 
 import {getCotizacionReal} from '../src/helpers/getCotizacionReal';
 
@@ -16,6 +16,22 @@ const App = () => {
   const [ultimaActualizacion, setUltimaActualizacion] = useState("")
   const [reloadingApp, setReloadingApp] = useState(false);
   const [idNeg, setIdNeg] = useState();
+  const [idUser, setIdUser] = useState("");
+
+
+  useEffect(() => {
+    const url = window.location;
+    const urlSearch = url.search;
+
+    if (urlSearch) {
+      const params = urlSearch.split("=");
+      console.log(params);
+      const idUserFromParams = params[1];
+      setIdUser(Number(idUserFromParams));
+      // console.log("Usuario ->", idUserFromParams);
+    }
+  }, []);
+
 
   getCotizacionDolar().then((res) => {
     if (res.data){
@@ -30,7 +46,7 @@ const App = () => {
   });
 
   return (
-    <GlobalContext.Provider value={{cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp, idNeg, setIdNeg}}>
+    <GlobalContext.Provider value={{cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp, idNeg, setIdNeg, idUser, setIdUser}}>
       <ConfigProvider locale={esES}>
         <ApolloProvider client={client}>
           <Spin id="main_loader" tip="Cargando" spinning={reloadingApp} className="color">
