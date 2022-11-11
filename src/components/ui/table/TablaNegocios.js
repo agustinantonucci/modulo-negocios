@@ -372,11 +372,6 @@ const TablaNegocios = () => {
                 )}
               </>
             ) : null}
-            {/* {tipoFiltro === "abierto" ? (
-              <>
-                <Button title="Ver Negocio" onClick={() => obtenerFila()} placement="left" style={{border:"none", margin:"0px", padding:"0px", backgroundColor:"transparent", boxShadow:"none"}} icon={<EyeOutlined style={{ color: "green" }} />} />
-              </>
-            ) : null} */}
           </span>
         );
       },
