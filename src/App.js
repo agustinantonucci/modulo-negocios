@@ -25,7 +25,7 @@ const App = () => {
 
     if (urlSearch) {
       const params = urlSearch.split("=");
-      console.log(params);
+      //console.log(params);
       const idUserFromParams = params[1];
       setIdUser(Number(idUserFromParams));
       // console.log("Usuario ->", idUserFromParams);

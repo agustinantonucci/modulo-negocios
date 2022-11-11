@@ -73,11 +73,11 @@ const TablaNegocios = () => {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
-      console.log(negocios);
+      //console.log(negocios);
 
       setListadoNegocios(negocios.dataNeg);
 
-      console.log(verInfo);
+      //console.log(verInfo);
 
       setListadoEtiquetas(negocios.dataTags);
       setPipelines(
@@ -165,7 +165,7 @@ const TablaNegocios = () => {
     }
   }, [data, getConfiguracion, tipoFiltro]);
 
-  console.log(idUser);
+  //console.log(idUser);
 
   const obtenerFila = (val) => {
     setIdNeg(val);
