@@ -51,6 +51,8 @@ const TablaNegocios = () => {
     cotizacionReal,
     ultimaActualizacion,
     setReloadingApp,
+    idEtapa, 
+    setIdEtapa,
     idNeg,
     setIdNeg,
     idUser,
@@ -58,6 +60,7 @@ const TablaNegocios = () => {
 
   //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
+  localStorage.setItem("IdEtapa", idEtapa);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -167,22 +170,24 @@ const TablaNegocios = () => {
 
   //console.log(idUser);
 
-  const obtenerFila = (val) => {
-    setIdNeg(val);
+  const obtenerFila = (NegId,EtaId) => {
+    setIdNeg(NegId);
+    setIdEtapa(EtaId);
     const PORT = window.location.port ? window.location.port : 80;
     const PROTOCOL = window.location.protocol;
     const HOSTNAME = window.location.hostname;
     const loc = window.location.pathname;
     const URL = `${PROTOCOL}//${HOSTNAME}:${PORT}`;
 
-    //console.log("URL ", URL);
+    console.log("URL ", URL);
     const c = idUser;
-    const u = localStorage.getItem('usuario');
+    //const u = localStorage.getItem('usuario');
+    const u = 2049;
     //console.log("usuarioLocalStorage: ", u);
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
     //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
-    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&cliId=${u}`;
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${idNeg}&cliId=${u}`;
 
   };
 
@@ -504,7 +509,8 @@ const TablaNegocios = () => {
         }}
         onRow={(record) => ({
           onClick: () => {
-            obtenerFila(record.neg_id);
+            //console.log(record.neg_id,record.eta_id)
+            obtenerFila(record.neg_id,record.eta_id);
           },
         })}
       />
