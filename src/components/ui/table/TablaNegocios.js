@@ -181,8 +181,8 @@ const TablaNegocios = () => {
 
     console.log("URL ", URL);
     const c = idUser;
-    //const u = localStorage.getItem('usuario');
-    const u = 2049;
+    const u = localStorage.getItem('usuario');
+    //const u = 2049;
     //console.log("usuarioLocalStorage: ", u);
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
