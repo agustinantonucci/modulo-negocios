@@ -63,7 +63,6 @@ const TablaNegocios = () => {
   //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
   localStorage.setItem("IdEtapa", idEtapa);
-  localStorage.setItem("usuA", usuA);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -173,11 +172,8 @@ const TablaNegocios = () => {
 
   //console.log(idUser);
 
-  const obtenerFila = (record) => {
-    console.log(NegId,EtaId)
-    setIdNeg(record.neg_id);
-    setIdEtapa(record.eta_id);
-    setUsuA(record.usu_asig_id);
+  const obtenerFila = (val) => {
+    setIdNeg(val);
     const PORT = window.location.port ? window.location.port : 80;
     const PROTOCOL = window.location.protocol;
     const HOSTNAME = window.location.hostname;
@@ -192,7 +188,7 @@ const TablaNegocios = () => {
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
     //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
-    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${idNeg}&cliId=${u}`;
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&cliId=${u}`;
 
   };
 
@@ -514,8 +510,9 @@ const TablaNegocios = () => {
         }}
         onRow={(record) => ({
           onClick: () => {
-            console.log(record)
-            //obtenerFila(record);
+            //console.log(record)
+            obtenerFila(record.neg_id);
+            setIdEtapa(record.eta_id);
           },
         })}
       />
