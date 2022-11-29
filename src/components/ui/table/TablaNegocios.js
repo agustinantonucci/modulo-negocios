@@ -54,10 +54,13 @@ const TablaNegocios = () => {
     idNeg,
     setIdNeg,
     idUser,
+    etapaURL, 
+    setEtapaURL
   } = useContext(GlobalContext);
 
   //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
+  localStorage.setItem("etapaURL", etapaURL);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -505,6 +508,7 @@ const TablaNegocios = () => {
         onRow={(record) => ({
           onClick: () => {
             obtenerFila(record.neg_id);
+            setEtapaURL(record.eta_id)
           },
         })}
       />
