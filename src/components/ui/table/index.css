@@ -10,7 +10,7 @@ p {
 }
 
 .card-contadores {
-  width: 33%;
+  width: 45%;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -23,7 +23,7 @@ p {
 
 .card-content {
   display: flex;
-  width: 50%;
+  width: 35%;
   align-items: center;
   justify-content: center;
 }
