@@ -62,6 +62,8 @@ const TablaNegocios = () => {
   localStorage.setItem("IdNeg", idNeg);
   localStorage.setItem("etapaURL", etapaURL);
 
+  console.log(etapaURL)
+
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
   });
@@ -181,11 +183,12 @@ const TablaNegocios = () => {
     //console.log("URL ", URL);
     const c = idUser;
     const u = localStorage.getItem('usuario');
+    const e = etapaURL;
     //console.log("usuarioLocalStorage: ", u);
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
     //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
-    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&userId=${u}`;
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&etaId=${e}&userId=${u}`;
 
   };
 
