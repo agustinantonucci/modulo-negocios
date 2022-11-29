@@ -51,6 +51,8 @@ const TablaNegocios = () => {
     cotizacionReal,
     ultimaActualizacion,
     setReloadingApp,
+    usuA, 
+    setUsuA,
     idEtapa, 
     setIdEtapa,
     idNeg,
@@ -61,6 +63,7 @@ const TablaNegocios = () => {
   //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
   localStorage.setItem("IdEtapa", idEtapa);
+  localStorage.setItem("usuA", usuA);
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -170,9 +173,11 @@ const TablaNegocios = () => {
 
   //console.log(idUser);
 
-  const obtenerFila = (NegId,EtaId) => {
-    setIdNeg(NegId);
-    setIdEtapa(EtaId);
+  const obtenerFila = (record) => {
+    console.log(NegId,EtaId)
+    setIdNeg(record.neg_id);
+    setIdEtapa(record.eta_id);
+    setUsuA(record.usu_asig_id);
     const PORT = window.location.port ? window.location.port : 80;
     const PROTOCOL = window.location.protocol;
     const HOSTNAME = window.location.hostname;
@@ -509,8 +514,8 @@ const TablaNegocios = () => {
         }}
         onRow={(record) => ({
           onClick: () => {
-            //console.log(record.neg_id,record.eta_id)
-            obtenerFila(record.neg_id,record.eta_id);
+            console.log(record)
+            //obtenerFila(record);
           },
         })}
       />
