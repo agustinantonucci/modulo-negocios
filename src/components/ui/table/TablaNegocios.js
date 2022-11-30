@@ -176,6 +176,7 @@ const TablaNegocios = () => {
 
   //console.log(idUser);
 
+  console.log(pipeURL);
   const obtenerFila = (val) => {
     setIdNeg(val);
     const PORT = window.location.port ? window.location.port : 80;
@@ -191,9 +192,8 @@ const TablaNegocios = () => {
     //console.log("usuarioLocalStorage: ", u);
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
-    //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
-    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&pipId=${e}&userId=${u}`;
-
+    //window.location.href =`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&pipId=${e}&userId=${u}` //.28/tati
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&pipId=${e}&userId=${u}`; // .28/duoc y .153/duoc
   };
 
   const getColumnSearchProps = (dataIndex) => ({
