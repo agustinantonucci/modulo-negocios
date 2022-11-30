@@ -515,8 +515,8 @@ const TablaNegocios = () => {
         onRow={(record) => ({
           onClick: () => {
             //console.log(record.pip_id)
-            obtenerFila(record.neg_id);
-            setPipeURL(record.pip_id)
+             obtenerFila(record.neg_id);
+             setPipeURL(record.pip_id)
           },
         })}
       />
