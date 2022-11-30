@@ -58,11 +58,15 @@ const TablaNegocios = () => {
     idNeg,
     setIdNeg,
     idUser,
+    pipeURL, 
+    setPipeURL
   } = useContext(GlobalContext);
 
   //console.log(idNeg);
   localStorage.setItem("IdNeg", idNeg);
-  localStorage.setItem("IdEtapa", idEtapa);
+  localStorage.setItem("pipeURL", pipeURL);
+
+  //console.log(pipeURL)
 
   const { data, loading, error } = useQuery(GET_NEGOCIOS, {
     variables: { idCliente: Number(idCliente) },
@@ -78,7 +82,7 @@ const TablaNegocios = () => {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
-      //console.log(negocios);
+      console.log(negocios);
 
       setListadoNegocios(negocios.dataNeg);
 
@@ -183,12 +187,12 @@ const TablaNegocios = () => {
     console.log("URL ", URL);
     const c = idUser;
     const u = localStorage.getItem('usuario');
-    //const u = 2049;
+    const e = pipeURL;
     //console.log("usuarioLocalStorage: ", u);
     //console.log(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`);
 
     //window.open(`${PROTOCOL}//${HOSTNAME}:${PORT}/tati/deal/?negId=${val}&userId=${u}`)
-    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&cliId=${u}`;
+    window.location.href = `${PROTOCOL}//${HOSTNAME}:${PORT}/duoc/deal/?negId=${val}&pipId=${e}&userId=${u}`;
 
   };
 
@@ -510,9 +514,9 @@ const TablaNegocios = () => {
         }}
         onRow={(record) => ({
           onClick: () => {
-            //console.log(record)
+            //console.log(record.pip_id)
             obtenerFila(record.neg_id);
-            setIdEtapa(record.eta_id);
+            setPipeURL(record.pip_id)
           },
         })}
       />
