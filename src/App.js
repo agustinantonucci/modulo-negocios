@@ -15,7 +15,7 @@ const App = () => {
   const [cotizacionReal, setCotizacionReal] = useState(0);
   const [ultimaActualizacion, setUltimaActualizacion] = useState("")
   const [reloadingApp, setReloadingApp] = useState(false);
-  const [etapaURL, setEtapaURL ] = useState();
+  const [pipeURL, setPipeURL ] = useState();
   const [idNeg, setIdNeg] = useState();
   const [idUser, setIdUser] = useState("");
 
@@ -47,7 +47,7 @@ const App = () => {
   });
 
   return (
-    <GlobalContext.Provider value={{cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp, idNeg, setIdNeg, idUser, setIdUser, etapaURL, setEtapaURL}}>
+    <GlobalContext.Provider value={{cotizacionDolar, cotizacionReal, ultimaActualizacion, setReloadingApp, idNeg, setIdNeg, idUser, setIdUser, pipeURL, setPipeURL}}>
       <ConfigProvider locale={esES}>
         <ApolloProvider client={client}>
           <Spin id="main_loader" tip="Cargando" spinning={reloadingApp} className="color">
