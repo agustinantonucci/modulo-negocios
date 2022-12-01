@@ -82,7 +82,7 @@ const TablaNegocios = () => {
       const dataConfig = JSON.parse(getConfiguracion.getConfiguracionResolver);
       const negocios = JSON.parse(data.getNegociosIframeResolver);
 
-      console.log(negocios);
+      // console.log(negocios);
 
       setListadoNegocios(negocios.dataNeg);
 
@@ -176,7 +176,7 @@ const TablaNegocios = () => {
 
   //console.log(idUser);
 
-  console.log(pipeURL);
+  
   const obtenerFila = (val) => {
     setIdNeg(val);
     const PORT = window.location.port ? window.location.port : 80;
@@ -185,7 +185,7 @@ const TablaNegocios = () => {
     const loc = window.location.pathname;
     const URL = `${PROTOCOL}//${HOSTNAME}:${PORT}`;
 
-    console.log("URL ", URL);
+    // console.log("URL ", URL);
     const c = idUser;
     const u = localStorage.getItem('usuario');
     const e = pipeURL;
